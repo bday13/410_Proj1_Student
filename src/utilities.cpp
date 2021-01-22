@@ -14,7 +14,7 @@
 
 using namespace std;
 
-vector <process_stats> stats;
+std::vector <process_stats> stats;
 bool cpuSort (process_stats, process_stats);
 bool processNumSort (process_stats, process_stats);
 bool ioTimeSort (process_stats, process_stats);
@@ -31,46 +31,53 @@ int stringToInt(const char *myString) {
 
 int loadData(const char* filename, bool ignoreFirstRow) {
 
-	//open file
+	//clears vector and opens file
+	stats.clear();
 	ifstream file;
 	file.open(filename);
 
-	//create new string, temp vector, and clear stats
-	string line;
-	vector<string> temp;
-	stats.clear();
+	//if file is open, enter if block
+	if (file.is_open()) {
 
-	//check for open file
-	if (!file.is_open()) {
+		string line;
+		while (getline(file, line)) {
+
+			//if ignoreFirstRow == true then discard the first row
+			//else move to while loop
+			if (ignoreFirstRow) {
+				ignoreFirstRow = false;
+			} else {
+
+				string str;
+				vector<string> temp;
+				stringstream stream(line);
+
+				while (getline(stream, str, CHAR_TO_SEARCH_FOR)) {
+					temp.push_back(str);
+				}
+
+				//checks size of temp to be exactly 4
+				if (temp.size() == 4) {
+
+					// if there is no space or a space, process stat
+					if ((count(temp.begin(), temp.end(), "")) == 0 &&
+							(count(temp.begin(), temp.end(), " ")) == 0) {
+						process_stats stat;
+						stat.process_number = stoi(temp[0]);
+						stat.start_time = stoi(temp[1]);
+						stat.cpu_time = stoi(temp[2]);
+						stat.io_time = stoi(temp[3]);
+						stats.push_back(stat);
+					}
+				}
+			}
+		}
+	//file not open, return could not open
+	} else {
 		return COULD_NOT_OPEN_FILE;
 	}
 
-	//ignore first row
-	if (ignoreFirstRow == true) {
-		getline(file, line);
-	}
-
-	//begin to read file
-	stringstream stream(line);
-	string str;
-	while (getline(file, line)) {
-		while (getline(stream, str, CHAR_TO_SEARCH_FOR)) {
-			temp.push_back(str);
-		}
-		//check size of vector to be 4
-		if (temp.size() == 4) {
-			if ((std::count(temp.begin(), temp.end(), "")) == 0 &&
-					(std::count(temp.begin(), temp.end(), " ")) == 0) {
-				process_stats stat;
-				stat.process_number = stoi(temp[0]);
-				stat.start_time = stoi(temp[1]);
-				stat.cpu_time = stoi(temp[2]);
-				stat.io_time = stoi(temp[3]);
-				stats.push_back(stat);
-			}
-		}
-	}
-
+	//close file and return success when done
 	file.close();
 	return SUCCESS;
 }
@@ -98,23 +105,28 @@ void sortData(SORT_ORDER mySortOrder) {
 	switch (mySortOrder) {
 
 		case CPU_TIME:
-			std::sort(stats.begin(), stats.end(), cpuSort);
+			sort(stats.begin(), stats.end(), cpuSort);
 			break;
 
 		case PROCESS_NUMBER:
-			std::sort(stats.begin(), stats.end(), processNumSort);
+			sort(stats.begin(), stats.end(), processNumSort);
 			break;
 
 		case IO_TIME:
-			std::sort(stats.begin(), stats.end(), ioTimeSort);
+			sort(stats.begin(), stats.end(), ioTimeSort);
 			break;
 
 		case START_TIME:
-			std::sort(stats.begin(), stats.end(), startTimeSort);
+			sort(stats.begin(), stats.end(), startTimeSort);
+			break;
+
+		default:
 			break;
 	}
 }
 
+//return the first struct in the vector
+//then deletes it from the vector
 process_stats getNext() {
 	process_stats myFirst;
 	myFirst = stats.front();
