@@ -52,7 +52,7 @@ int loadData(const char* filename, bool ignoreFirstRow) {
 				vector<string> temp;
 				stringstream stream(line);
 
-				while (getline(stream, str, CHAR_TO_SEARCH_FOR)) {
+				while (getline(stream, str, ',')) {
 					temp.push_back(str);
 				}
 
@@ -60,8 +60,7 @@ int loadData(const char* filename, bool ignoreFirstRow) {
 				if (temp.size() == 4) {
 
 					// if there is no space or a space, process stat
-					if ((count(temp.begin(), temp.end(), "")) == 0 &&
-							(count(temp.begin(), temp.end(), " ")) == 0) {
+					if ((count(temp.begin(), temp.end(), "")) == 0) {
 						process_stats stat;
 						stat.process_number = stoi(temp[0]);
 						stat.start_time = stoi(temp[1]);
@@ -90,12 +89,12 @@ bool processNumSort (process_stats x, process_stats y) {
 	return (x.process_number < y.process_number);
 }
 
-bool startTimeSort(process_stats x, process_stats y) {
-	return (x.start_time < y.start_time);
-}
-
 bool ioTimeSort(process_stats x, process_stats y) {
 	return (x.io_time < y.io_time);
+}
+
+bool startTimeSort(process_stats x, process_stats y) {
+	return (x.start_time < y.start_time);
 }
 
 
@@ -128,10 +127,10 @@ void sortData(SORT_ORDER mySortOrder) {
 //return the first struct in the vector
 //then deletes it from the vector
 process_stats getNext() {
-	process_stats myFirst;
-	myFirst = stats.front();
+	process_stats pstats;
+	pstats = stats.front();
 	stats.erase(stats.begin());
-	return myFirst;
+	return pstats;
 }
 
 //returns number of process_stats structs in the vector holding them
