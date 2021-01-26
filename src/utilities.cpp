@@ -14,7 +14,7 @@
 
 using namespace std;
 
-std::vector <process_stats> stats;
+vector <process_stats> stats;
 bool cpuSort (process_stats, process_stats);
 bool processNumSort (process_stats, process_stats);
 bool ioTimeSort (process_stats, process_stats);
@@ -57,17 +57,14 @@ int loadData(const char* filename, bool ignoreFirstRow) {
 				}
 
 				//checks size of temp to be exactly 4
-				if (temp.size() == 4) {
-
-					// if there is no space or a space, process stat
-					if ((count(temp.begin(), temp.end(), "")) == 0) {
-						process_stats stat;
-						stat.process_number = stoi(temp[0]);
-						stat.start_time = stoi(temp[1]);
-						stat.cpu_time = stoi(temp[2]);
-						stat.io_time = stoi(temp[3]);
-						stats.push_back(stat);
-					}
+				// if there is no space, process stat
+				if (temp.size() == 4 && (count(temp.begin(), temp.end(), "")) == 0) {
+					process_stats stat;
+					stat.process_number = stoi(temp[0]);
+					stat.start_time = stoi(temp[1]);
+					stat.cpu_time = stoi(temp[2]);
+					stat.io_time = stoi(temp[3]);
+					stats.push_back(stat);
 				}
 			}
 		}
